@@ -139,12 +139,14 @@ for ind, ichannel in enumerate(data_ch):
     plt.ylim([4, 150])             # ... set the frequency range,
     plt.xlabel('Time (s)')        # ... and label the axes
     plt.ylabel('Frequency (Hz)')
+    #plt.axvline(x= , color='k', linestyle='--')   # ... denotes time of stimulus onset
     plt.title(label = regions[ind])
     plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
     plt.show()
     
     
-# %% raw signal and power spectral density
+#%% raw signal and power spectral density
+
 # check for artefacts / noise in signal
 
 data_channel = data_all[1,:] # specify channel here
