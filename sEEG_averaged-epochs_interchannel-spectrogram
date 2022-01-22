@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 23 22:19:26 2021
+@author: bartek
+
+"""
+
+import glob
+import pyedflib
+from scipy.fftpack import fft
+from scipy import signal
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, lfilter, iirfilter, spectrogram
+
+
+def get_fft_values(y_values, T, N, f_s):
+
+    f_values = np.linspace(0.0, 1.0/(2.0*T), N//2)
+    fft_values_ = fft(y_values)
+    fft_values = 2.0/N * np.abs(fft_values_[0:N//2])
+    return f_values, fft_values
+
+def butter_bandpass(lowcut, highcut, fs, order):
+	nyq = 0.5 * fs
+	low = lowcut / nyq
+	high = highcut / nyq
+	b, a = butter(order, [low, high], btype='band')
+	return b, a
+	   
+def butterBandpass(d, lowcut, highcut, fs, order):
+	b, a = butter_bandpass(lowcut, highcut, fs, order)
+	y = lfilter(b, a, d)
+	return y
+
+def notchFilter(data, fs, band, frq, order, filter_type):
+	nyq = fs/2.0
+	low = frq - band/2.0
+	high = frq + band/2.0
+	low = low/nyq
+	high = high/nyq
+	b, a = iirfilter(order, [low, high], btype='bandstop', analog=False, ftype=filter_type)
+	filtered_data = lfilter(b, a, data)
+	return filtered_data
+
+#%%
+#collects files from folder, set file path w wildcard
+files = glob.glob() 
+
+#use with external drive on mac
+#files_r = ['r\''+files for files in files]
+#files_r
+
+#%%
+#edf reader, assumes all channels have the same sampling frequency
+
+iedf = files[0]
+
+f = pyedflib.EdfReader(iedf)    
+annots = f.readAnnotations()
+num_chans = f.signals_in_file
+n_samps = f.getNSamples()[0]
+
+downsamplefactor = 1
+sf_all = f.getSampleFrequencies()/downsamplefactor
+f.close()
+
+# init empty channels list
+chan_labels = []
+
+for i in np.arange(num_chans):
+    chan_labels.append(str(i)+'_' + (f.signal_label(i).decode('latin-1').strip()))
+
+#%%
+epochs = []
+
+for iepoch in files:
+    
+    f = pyedflib.EdfReader(iepoch)
+    data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
+    count = 0 
+    
+    for i in np.arange(num_chans):
+
+        data[count, :] = f.readSignal(count)
+        count += 1
+        
+    epochs.append(data)
+        
+    f.close()
+    
+epochs[0].shape
+
+#plots raw ieeg signal
+plt.figure(figsize=(10,5))
+plt.plot(np.arange(n_samps), epochs[0][1])
+plt.xlabel('Time (seconds)')
+plt.ylabel('Voltage')
+plt.show()
+
+#%%
+#set and apply filtering
+sf = sf_all[0]
+
+# bandpass filter
+lowCut = 4
+highCut = 100
+
+data_all = []
+
+for iepoch in epochs:
+    
+    epochs_f = butterBandpass(iepoch, lowCut, highCut, sf, 3)
+    epoch_f = notchFilter(epochs_f, sf, 1, 60, 1, 'butter')
+    
+    data_all.append(epoch_f)
+
+#plots filtered signal
+plt.figure(figsize=(10,5))
+plt.plot(np.arange(n_samps), data_all[0][1])
+plt.xlabel('Time (seconds)')
+plt.ylabel('Voltage')
+plt.show()
+
+#%%
+# set interval size and overlap intervals
+interval = int(sf)
+overlap = int(sf * .90) 
+
+# set contact number ... ref to chan_labels
+contact = 
+
+sxx_values =[]
+count = 0
+
+while count < len(files):
+    f, t, Sxx = spectrogram(data_all[count][contact], fs=sf, window=('tukey', 0.6), nperseg=interval, noverlap=overlap)
+    sxx_values.append(Sxx)
+    count += 1
+        
+sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
+
+# plots spectrogram
+plt.figure(figsize=(12,8))
+plt.pcolormesh(t, f, 16 * np.log10(sxx_m), cmap='jet', shading='gouraud')  # Plot the result
+plt.colorbar()                # ... with a color bar,
+plt.ylim([4, 100])             # ... set the frequency range,
+plt.xlabel('Time (s)')        # ... and label the axes
+plt.ylabel('Frequency (Hz)')
+plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
+plt.axvline(x=7 , color='k', linestyle='--')   
+plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
+plt.show()
+
