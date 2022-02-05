@@ -64,15 +64,16 @@ def get_bsl_SD(bsl_sxx_values):
         ind += 1
     return bsl_SD
 
-#%%
+#%% path to folder
 
-files = glob.glob(r'/Volumes/ExFAT-EMTEC/EMU/0Subject-files/015/iEEG/**SHAM_epoch.edf') 
+files = glob.glob('') 
 
 
 files_r = ['r\''+files for files in files]
 files_r
 
-#%%
+#%% read and writes edf file
+
 iedf = files[0]
 
 f = pyedflib.EdfReader(iedf)    
@@ -91,7 +92,7 @@ for i in np.arange(num_chans):
     chan_labels.append(str(i)+'_' + (f.signal_label(i).decode('latin-1').strip()))
 chan_labels
 
-#%%
+#%% inspect signal and apply filtering
 
 #data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
 
@@ -118,7 +119,6 @@ plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), epochs[0][1])
 plt.show()
 
-#apply filtering
 #sf assuming all channel are sampling at same frequency
 sf = sf_all[0]
 
@@ -139,12 +139,13 @@ plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), data_all[0][1])
 plt.show()
 
-#%%
+#%% plots averaged trials
 
 # interval size and overlap intervals
 interval = int(sf)
 overlap = int(sf * .90) 
 
+# specify the contact number
 contact = 68
 count = 0
 sxx_values =[]
@@ -167,7 +168,7 @@ plt.axvline(x=7 , color='k', linestyle='--')
 plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
-#%%  baseline (first 40 windows) z-score bsl
+#%%  baseline (first 40 windows) z-score
 
 sxx_bsl = sxx_m[:,0:40]
 
@@ -193,24 +194,24 @@ plt.axvline(x=7 , color='k', linestyle='--')
 plt.clim([10,-10])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
-#%% Plots all the individual trials
+#%% Plots the individual trials
 
-file_num = 0
+# file_num = 0
 
-for sxx_i in sxx_values:
+# for sxx_i in sxx_values:
 
-    plt.figure(figsize=(8,6))
-    plt.pcolormesh(t, f, 16 * np.log10(sxx_i), cmap='jet', shading='gouraud')  # Plot the result
-    plt.colorbar()                # ... with a color bar,
-    plt.ylim([4, 150])             # ... set the frequency range,
-    plt.xlabel('Time (s)')        # ... and label the axes
-    plt.ylabel('Frequency (Hz)')
-    plt.title(files[file_num])
-    plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
-    plt.axvline(x=7 , color='k', linestyle='--')   
-    plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
-    plt.show()
+#     plt.figure(figsize=(8,6))
+#     plt.pcolormesh(t, f, 16 * np.log10(sxx_i), cmap='jet', shading='gouraud')  # Plot the result
+#     plt.colorbar()                # ... with a color bar,
+#     plt.ylim([4, 150])             # ... set the frequency range,
+#     plt.xlabel('Time (s)')        # ... and label the axes
+#     plt.ylabel('Frequency (Hz)')
+#     plt.title(files[file_num])
+#     plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
+#     plt.axvline(x=7 , color='k', linestyle='--')   
+#     plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
+#     plt.show()
     
-    file_num += 1
+#     file_num += 1
 
 
