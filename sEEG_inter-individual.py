@@ -6,10 +6,7 @@ Created on Mon Feb  7 23:12:25 2022
 @author: bartek
 """
 
-from mpl_toolkits.mplot3d import Axes3D
-import pyedflib
 from scipy.fftpack import fft
-from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
@@ -18,16 +15,17 @@ import glob
 
 #%% reading csv/xls files, (150,140) in this case already normalized
 
-files = glob.glob('') 
+files = glob.glob('') # path to file folder
 
 files
 
+hz = 150  # select the highest Hz band you are interested in
 count = 0
 sxx_z = []
 
 while count < len(files):
     df = pd.read_excel(files[count])
-    df = df[0:150]
+    df = df[0:hz]
     s = df.to_numpy()
     sxx_z.append(s)
     count += 1
