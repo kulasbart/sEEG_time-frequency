@@ -6,6 +6,6 @@ Includes preprocessing steps, computation of spectrogram for time and frequency 
 
 For comparison of trials across different recorded contacts: the averaging script plots the mean spectral power over time of clipped edf files from the same individual... ensure trial are free of artifact
 
----IN PROGRESS---
+z-score baseline normalization script
 
-Future additions: z-score normalization for inter-individual and group analyses. Also planning to expand the workflow to inspect phase coupling across ieeg channels
+For group analyses of subjects with similar electrode coverage. Normalizes to baseline activity (pre-stimuli). The script writes a new csv file which are merged using sEEG_inter_individual.py
