@@ -53,28 +53,32 @@ beta_p_m = np.array(beta_p).mean(axis=0)
 low_gamma_p_m = np.array(low_gamma_p).mean(axis=0)
 
 sns.set_theme(style="darkgrid")
+fig = plt.figure()
+
+plt.subplot(2,2,1)
 sns.lineplot(x=t, y=theta_p_m)
 plt.title("theta-band response")
 plt.xlim([-4,10])
 plt.ylim([-150,150])
-plt.show()
 
+plt.subplot(2,2,2)
 sns.lineplot(x=t, y=alpha_p_m)
 plt.title("alpha-band response")
 plt.xlim([-4,10])
 plt.ylim([-150,150])
-plt.show()
 
+plt.subplot(2,2,3)
 sns.lineplot(x=t, y=beta_p_m)
 plt.title("beta-band response")
 plt.xlim([-4,10])
 plt.ylim([-150,150])
-plt.show()
 
+plt.subplot(2,2,4)
 sns.lineplot(x=t, y=low_gamma_p_m)
 plt.title("low-gamma response")
 plt.xlim([-4,10])
 plt.ylim([-150,250])
+plt.tight_layout()
 plt.show()
 
 #%%
