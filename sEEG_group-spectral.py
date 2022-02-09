@@ -32,7 +32,8 @@ while count < len(files):
     
 sxx_z_m = np.sum(sxx_z[0:count-1], axis=0) / count #mean z-score
 
-t = np.linspace(0.5,14.48144531,140) # generate time axis
+t = np.linspace(0.5,14.48144531,140) # generate time axis, 15 second samples with 140 windows in this case
+t = t - 5  # zero stimulus time, 5 s in this case
 f = np.linspace(0,149,150) # Hz scale
 
 #%% plot!
