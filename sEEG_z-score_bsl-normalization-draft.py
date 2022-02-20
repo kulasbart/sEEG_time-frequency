@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import welch, hanning, butter, lfilter, resample, iirfilter, spectrogram
 import glob
+import pandas as pd
 
 
 def get_fft_values(y_values, T, N, f_s):
@@ -64,7 +65,7 @@ def get_bsl_SD(bsl_sxx_values):
 
 #%% path to folder
 
-files = glob.glob('') # insert path to folder and wildcard condition
+files = glob.glob(r'/Volumes/ExFAT-EMTEC/EMU/0Subject-files/015/iEEG/**SHAM_epoch.edf') # insert path to folder and wildcard condition
 
 
 files_r = ['r\''+files for files in files] #use for external drives (mac)
@@ -144,7 +145,7 @@ interval = int(sf)
 overlap = int(sf * .90) 
 
 # specify the contact number
-contact = 68   # refer to chan_labels
+contact = 21   # refer to chan_labels
 count = 0
 sxx_values =[]
 
@@ -169,22 +170,23 @@ plt.show()
 
 #%%  baseline z-score
 
-sxx_bsl = sxx_m[:,0:40] # using first 40 fft windows in this case
+# be cautious of edge effect when selecting baseline
+sxx_bsl = sxx_m[:0:40] # using first 40 fft windows in this case
 
 bsl_m = get_bsl_Mean(sxx_bsl)
 bsl_SD = get_bsl_SD(sxx_bsl)
 
-sxx_standardized = []
+sxx_normalized = []
 hz_num = 0
 
 for hz in sxx_m:
     z_scored = (hz-bsl_m[hz_num])/bsl_SD[hz_num]
     hz_num += 1
-    sxx_standardized.append(z_scored)
+    sxx_normalized.append(z_scored)
 
 
 plt.figure(figsize=(12,8))
-plt.pcolormesh(t, f, np.log10(sxx_standardized), cmap='jet',shading='gouraud') 
+plt.pcolormesh(t, f, np.log10(sxx_normalized), cmap='jet',shading='gouraud') 
 plt.colorbar()                # ... with a color bar,
 plt.ylim([4,50])             # ... set the frequency range,
 plt.xlabel('Time (s)')        # ... and label the axes
@@ -192,12 +194,12 @@ plt.ylabel('Frequency (Hz)')
 plt.title(chan_labels[contact])
 plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
 plt.axvline(x=7 , color='k', linestyle='--')   
-plt.clim([2,-2])  		# ... power scale, should be balanced (+y,-y)
+plt.clim([1,-1])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
 #%% load to spreadsheet
 
-pt_num = '' # add subject identifier prefix
+pt_num = '011' # add your subject identifier prefix
 
 df = pd.DataFrame(sxx_normalized)
 writer = pd.ExcelWriter(pt_num+'_'+str(chan_labels[contact])+'_sxx_norm.xlsx', engine='xlsxwriter')
