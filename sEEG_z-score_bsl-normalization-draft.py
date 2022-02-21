@@ -65,7 +65,7 @@ def get_bsl_SD(bsl_sxx_values):
 
 #%% path to folder
 
-files = glob.glob(r'/Volumes/ExFAT-EMTEC/EMU/0Subject-files/015/iEEG/**SHAM_epoch.edf') # insert path to folder and wildcard condition
+files = glob.glob('') # insert path to folder and wildcard condition
 
 
 files_r = ['r\''+files for files in files] #use for external drives (mac)
@@ -145,7 +145,7 @@ interval = int(sf)
 overlap = int(sf * .90) 
 
 # specify the contact number
-contact = 21   # refer to chan_labels
+contact =   # refer to chan_labels
 count = 0
 sxx_values =[]
 
@@ -157,21 +157,21 @@ while count < len(files):
 sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 
 plt.figure(figsize=(12,8))
-plt.pcolormesh(t, f, 16 * np.log10(sxx_m), cmap='jet',shading='gouraud')
+plt.pcolormesh(t, f, np.log10(sxx_m), cmap='jet',shading='gouraud')
 plt.colorbar()                # ... with a color bar,
-plt.ylim([4,150])             # ... set the frequency range,
-plt.xlabel('Time (s)')        # ... and label the axes
+plt.ylim([4,150])             # ... frequency range... large for data inspection
+plt.xlabel('Time (s)')
 plt.ylabel('Frequency (Hz)')
 plt.title(chan_labels[contact])
-plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
-plt.axvline(x=7 , color='k', linestyle='--')   
-plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
+#plt.axvline(x=5 , color='k', linestyle='--')   # ... stimulus start
+#plt.axvline(x=7 , color='k', linestyle='--')   # ... end
+plt.clim([2,-2])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
 #%%  baseline z-score
 
 # be cautious of edge effect when selecting baseline
-sxx_bsl = sxx_m[:0:40] # using first 40 fft windows in this case
+sxx_bsl = sxx_m[:,5:40] # using first 40 fft windows in this case
 
 bsl_m = get_bsl_Mean(sxx_bsl)
 bsl_SD = get_bsl_SD(sxx_bsl)
@@ -184,22 +184,25 @@ for hz in sxx_m:
     hz_num += 1
     sxx_normalized.append(z_scored)
 
-
+# baseline normalized spectrogram
 plt.figure(figsize=(12,8))
-plt.pcolormesh(t, f, np.log10(sxx_normalized), cmap='jet',shading='gouraud') 
+plt.pcolormesh(t, f, np.log10(sxx_normalized), cmap='jet',shading='gouraud')  # Plot the result
 plt.colorbar()                # ... with a color bar,
+plt.xlim([-4,8]) 
+plt.xlabel('Time (s)',fontweight='bold',fontsize='17')
+plt.xticks(color='k')
+plt.xticks(fontsize= '14')
+plt.ylabel('Frequency (Hz)',fontweight='bold',fontsize='17')
 plt.ylim([4,50])             # ... set the frequency range,
-plt.xlabel('Time (s)')        # ... and label the axes
-plt.ylabel('Frequency (Hz)')
-plt.title(chan_labels[contact])
-plt.axvline(x=5 , color='k', linestyle='--')   # ... denotes stimulus onset
-plt.axvline(x=7 , color='k', linestyle='--')   
+plt.yticks(fontsize= '14')
+#plt.axvline(x=0 , color='k', linestyle='--')   # ... stimulus start
+#plt.axvline(x=7 , color='k', linestyle='--')   # ... end
 plt.clim([1,-1])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
 #%% load to spreadsheet
 
-pt_num = '011' # add your subject identifier prefix
+pt_num = '' # insert subject identifier prefix
 
 df = pd.DataFrame(sxx_normalized)
 writer = pd.ExcelWriter(pt_num+'_'+str(chan_labels[contact])+'_sxx_norm.xlsx', engine='xlsxwriter')
@@ -209,20 +212,20 @@ writer.save()
 
 #%% Plots the individual trials
 
-# file_num = 0
+file_num = 0
 
-# for sxx_i in sxx_values:
+for sxx_i in sxx_values:
 
-#     plt.figure(figsize=(8,6))
-#     plt.pcolormesh(t, f, 16 * np.log10(sxx_i), cmap='jet', shading='gouraud') 
-#     plt.colorbar()               
-#     plt.ylim([4, 150])           
-#     plt.xlabel('Time (s)')    
-#     plt.ylabel('Frequency (Hz)')
-#     plt.title(files[file_num]) # file name ... useful if you include desc or timestamp in name
-#     plt.axvline(x=5 , color='k', linestyle='--')   
-#     plt.axvline(x=7 , color='k', linestyle='--')   
-#     plt.clim([40,-40])  		
-#     plt.show()
+    plt.figure(figsize=(8,6))
+    plt.pcolormesh(t, f, 16 * np.log10(sxx_i), cmap='jet', shading='gouraud') 
+    plt.colorbar()               
+    plt.ylim([4, 150])           
+    plt.xlabel('Time (s)')    
+    plt.ylabel('Frequency (Hz)')
+    plt.title(files[file_num]) # file name ... useful if you include desc or timestamp in name
+    plt.axvline(x=5 , color='k', linestyle='--')   
+    plt.axvline(x=7 , color='k', linestyle='--')   
+    plt.clim([40,-40])  		
+    plt.show()
     
-#     file_num += 1
+    file_num += 1
