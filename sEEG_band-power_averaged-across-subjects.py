@@ -19,19 +19,33 @@ alpha_p = []
 beta_p = []
 low_gamma_p = []
 
+theta_z = []
+alpha_z = []
+beta_z = []
+low_gamma_z = []
+
 while count < len(files):
     df = pd.read_excel(files[count])
     df = df[0:150]
-    theta = df[4:9].to_numpy().mean(axis= 0)
-    alpha = df[8:14].to_numpy().mean(axis= 0)
-    beta = df[13:33].to_numpy().mean(axis= 0)
-    low_gamma = df[32:60].to_numpy().mean(axis= 0)
     
-    theta = (theta - (theta[3:36].mean()))*100
+    theta = df[3:7].to_numpy().mean(axis= 0) # 4-8 Hz
+    alpha = df[7:14].to_numpy().mean(axis= 0) # 8-13 Hz
+    beta = df[14:31].to_numpy().mean(axis= 0) # 13-32 Hz
+    low_gamma = df[31:59].to_numpy().mean(axis= 0) # >32Hz
+    
+    # z-scored power changes
+    theta_z.append(theta)
+    alpha_z.append(alpha)
+    beta_z.append(beta)
+    low_gamma_z.append(low_gamma)
+    
+    # 3 second baseline sample starting at fourth window to avoid edge artifact in baseline
+    theta = (theta - (theta[3:36].mean()))*100 
     alpha = (alpha - (alpha[3:36].mean()))*100
     beta = (beta - (beta[3:36].mean()))*100
     low_gamma = (low_gamma - (low_gamma[3:36].mean()))*100 
-        
+    
+    # % change (from baseline)
     theta_p.append(theta)
     alpha_p.append(alpha)
     beta_p.append(beta)
@@ -41,11 +55,12 @@ while count < len(files):
     sxx_z.append(s)
     count += 1
 
+
+#%% plotssss
+
 t = np.linspace(0.5,14.48144531,140)
 f = np.linspace(0,149,150)
 t = t-5
-
-#%% plots plots plots
 
 theta_p_m = np.array(theta_p).mean(axis=0)
 alpha_p_m = np.array(alpha_p).mean(axis=0)
@@ -58,26 +73,35 @@ fig = plt.figure()
 plt.subplot(2,2,1)
 sns.lineplot(x=t, y=theta_p_m)
 plt.title("theta-band response")
-plt.xlim([-4,10])
-plt.ylim([-150,150])
+plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   # ... denotes stimulus onset
+plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
+plt.xlim([-4,8])
+#plt.ylim([-150,150])
+plt.ylim([0,5])
 
 plt.subplot(2,2,2)
 sns.lineplot(x=t, y=alpha_p_m)
+plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
+plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.title("alpha-band response")
-plt.xlim([-4,10])
-plt.ylim([-150,150])
+plt.xlim([-4,8])
+plt.ylim([0,5])
 
 plt.subplot(2,2,3)
 sns.lineplot(x=t, y=beta_p_m)
 plt.title("beta-band response")
-plt.xlim([-4,10])
-plt.ylim([-150,150])
+plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
+plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
+plt.xlim([-4,8])
+plt.ylim([0,5])
 
 plt.subplot(2,2,4)
 sns.lineplot(x=t, y=low_gamma_p_m)
 plt.title("low-gamma response")
-plt.xlim([-4,10])
-plt.ylim([-150,250])
+plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
+plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
+plt.xlim([-4,8])
+plt.ylim([0,5])
 plt.tight_layout()
 plt.show()
 
@@ -97,10 +121,24 @@ plt.axvline(x=2 , color='k', linestyle='--', linewidth=1.2)
 plt.clim([1,-1])  		# ... power scale (Z), should be balanced (+y,-y)
 plt.show()
 
-# ensure all files have the same dimensions
+# ensures all files have the same dimensions
+
 num = 0
 for i in sxx_z:
     print(files[num])
     print(len(i))
     print(sxx_z[num].shape)
     num+=1
+
+
+
+
+
+
+
+
+
+
+
+
+
