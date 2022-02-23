@@ -76,8 +76,7 @@ plt.title("theta-band response")
 plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   # ... denotes stimulus onset
 plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.xlim([-4,8])
-#plt.ylim([-150,150])
-plt.ylim([0,5])
+plt.ylim([-150,150])
 
 plt.subplot(2,2,2)
 sns.lineplot(x=t, y=alpha_p_m)
@@ -85,7 +84,7 @@ plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)
 plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.title("alpha-band response")
 plt.xlim([-4,8])
-plt.ylim([0,5])
+plt.ylim([-150,150])
 
 plt.subplot(2,2,3)
 sns.lineplot(x=t, y=beta_p_m)
@@ -93,7 +92,7 @@ plt.title("beta-band response")
 plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
 plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.xlim([-4,8])
-plt.ylim([0,5])
+plt.ylim([-150,150])
 
 plt.subplot(2,2,4)
 sns.lineplot(x=t, y=low_gamma_p_m)
@@ -101,9 +100,20 @@ plt.title("low-gamma response")
 plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
 plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.xlim([-4,8])
-plt.ylim([0,5])
+plt.ylim([-150,150])
 plt.tight_layout()
 plt.show()
+
+#%%
+# data frame with averaged power changes across subjects x power bands
+
+df_powerbands = pd.DataFrame(columns=['theta_power','alpha_power','beta_power','low_gamma_power'])
+df_powerbands['theta_power'] = theta_p_m.tolist()
+df_powerbands['alpha_power'] = theta_p_m.tolist()
+df_powerbands['beta_power'] = theta_p_m.tolist()
+df_powerbands['low_gamma_power'] = theta_p_m.tolist()
+
+df_powerbands.to_clipboard(excel=True,index=False)
 
 #%%
 
@@ -129,16 +139,6 @@ for i in sxx_z:
     print(len(i))
     print(sxx_z[num].shape)
     num+=1
-
-
-
-
-
-
-
-
-
-
 
 
 
