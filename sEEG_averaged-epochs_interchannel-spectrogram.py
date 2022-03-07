@@ -105,7 +105,7 @@ sf = sf_all[0]
 
 # bandpass filter
 lowCut = 4
-highCut = 100
+highCut = 250
 
 data_all = []
 
@@ -143,13 +143,13 @@ sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 
 # plots spectrogram
 plt.figure(figsize=(12,8))
-plt.pcolormesh(t, f, 16 * np.log10(sxx_m), cmap='jet', shading='gouraud')  # Plot the result
+plt.pcolormesh(t, f, np.log10(sxx_m), cmap='jet', shading='gouraud')  # Plot the result
 plt.colorbar()                # ... with a color bar,
-plt.ylim([4, 100])             # ... set the frequency range,
+plt.ylim([4, 150])             # ... set the frequency range,
 plt.xlabel('Time (s)')        # ... and label the axes
 plt.ylabel('Frequency (Hz)')
 #plt.axvline(x=5 , color='k', linestyle='--')   # ... mark stimulus
 #plt.axvline(x=7 , color='k', linestyle='--')   
-plt.clim([40,-40])  		# ... power scale, should be balanced (+y,-y)
+plt.clim([1,-1])  		# ... power scale, can play around with scaling but it should be balanced (+y,-y)
 plt.show()
 
