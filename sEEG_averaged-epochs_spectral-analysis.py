@@ -44,16 +44,16 @@ def notchFilter(data, fs, band, frq, order, filter_type):
 	filtered_data = lfilter(b, a, data)
 	return filtered_data
 
-#%%
-#collects files from folder, set file path w wildcard
-files = glob.glob() 
+#%% collects epoched files from folder, replace 'path' with path to folder ... files must be same length
+
+files = glob.glob('path') 
 
 #use with external drive on mac
 #files_r = ['r\''+files for files in files]
 #files_r
 
 #%%
-#edf reader, assumes all channels have the same sampling frequency
+#reading edf file - assumes all channels have the same sampling frequency
 
 iedf = files[0]
 
@@ -66,14 +66,21 @@ downsamplefactor = 1
 sf_all = f.getSampleFrequencies()/downsamplefactor
 f.close()
 
-# init empty channels list
+# list of channels imported from edf
 chan_labels = []
 
 for i in np.arange(num_chans):
     chan_labels.append(str(i)+'_' + (f.signal_label(i).decode('latin-1').strip()))
 
-#%%
+#%% import channels from edf
+
+chan_labels = []
+
+for i in np.arange(num_chans):
+    chan_labels.append(str(i)+'_' + (f.signal_label(i).decode('latin-1').strip()))
 epochs = []
+
+# read epochs
 
 for iepoch in files:
     
@@ -92,18 +99,16 @@ for iepoch in files:
     
 epochs[0].shape
 
-#plots raw ieeg signal
+#plots raw ieeg signal for inspection
 plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), epochs[0][1])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Voltage')
 plt.show()
 
-#%%
-#set and apply filtering
+#%% set parameters and apply filtering
 sf = sf_all[0]
 
-# bandpass filter
 lowCut = 4
 highCut = 250
 
@@ -116,19 +121,18 @@ for iepoch in epochs:
     
     data_all.append(epoch_f)
 
-#plots filtered signal
+#plots the filtered signal for inspection
 plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), data_all[0][1])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Voltage')
 plt.show()
 
-#%%
-# set interval size and overlap intervals
+#%% set interval size and overlap intervals
 interval = int(sf)
 overlap = int(sf * .90) 
 
-# set contact number ... ref to chan_labels
+# set contact number ... indexing chan_labels
 contact = 
 
 sxx_values =[]
@@ -144,12 +148,12 @@ sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 # plots spectrogram
 plt.figure(figsize=(12,8))
 plt.pcolormesh(t, f, np.log10(sxx_m), cmap='jet', shading='gouraud')  # Plot the result
-plt.colorbar()                # ... with a color bar,
+plt.colorbar()               
 plt.ylim([4, 150])             # ... set the frequency range,
 plt.xlabel('Time (s)')        # ... and label the axes
 plt.ylabel('Frequency (Hz)')
-#plt.axvline(x=5 , color='k', linestyle='--')   # ... mark stimulus
-#plt.axvline(x=7 , color='k', linestyle='--')   
+plt.axvline(x=5 , color='k', linestyle='--')   # ... mark stimulus
+plt.axvline(x=7 , color='k', linestyle='--')   
 plt.clim([1,-1])  		# ... power scale, can play around with scaling but it should be balanced (+y,-y)
 plt.show()
 

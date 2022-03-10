@@ -93,7 +93,7 @@ chan_labels
 
 #%% inspect signal and apply filtering
 
-#data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
+data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
 
 epochs = []
 
@@ -163,14 +163,14 @@ plt.ylim([4,150])             # ... frequency range... large for data inspection
 plt.xlabel('Time (s)')
 plt.ylabel('Frequency (Hz)')
 plt.title(chan_labels[contact])
-#plt.axvline(x=5 , color='k', linestyle='--')   # ... stimulus start
-#plt.axvline(x=7 , color='k', linestyle='--')   # ... end
+plt.axvline(x=5 , color='k', linestyle='--')   # ... stimulus start
+plt.axvline(x=7 , color='k', linestyle='--')   # ... end
 plt.clim([2,-2])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
 #%%  baseline z-score
 
-# be cautious of edge effect when selecting baseline
+# be cautious of edge effect and being too close to the stimulus when selecting baseline
 sxx_bsl = sxx_m[:,5:40] # using first 40 fft windows in this case
 
 bsl_m = get_bsl_Mean(sxx_bsl)
@@ -195,12 +195,12 @@ plt.xticks(fontsize= '14')
 plt.ylabel('Frequency (Hz)',fontweight='bold',fontsize='17')
 plt.ylim([4,50])             # ... set the frequency range,
 plt.yticks(fontsize= '14')
-#plt.axvline(x=0 , color='k', linestyle='--')   # ... stimulus start
-#plt.axvline(x=7 , color='k', linestyle='--')   # ... end
+plt.axvline(x=0 , color='k', linestyle='--')   # ... stimulus start
+plt.axvline(x=7 , color='k', linestyle='--')   # ... end
 plt.clim([1,-1])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
 
-#%% load to spreadsheet
+#%% export to spreadsheet or database 
 
 pt_num = '' # insert subject identifier prefix
 
@@ -210,8 +210,7 @@ df.to_excel(writer, sheet_name=pt_num+chan_labels[contact], index=False)
 writer.save()
 
 
-#%% Plots the individual trials
-
+#%% plot the individual trials for quality control
 file_num = 0
 
 for sxx_i in sxx_values:
