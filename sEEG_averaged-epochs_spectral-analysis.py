@@ -46,18 +46,12 @@ def notchFilter(data, fs, band, frq, order, filter_type):
 
 #%% collects epoched files from folder, replace 'path' with path to folder ... files must be same length
 
-files = glob.glob('path') 
-
-#use with external drive on mac
-#files_r = ['r\''+files for files in files]
-#files_r
+data_dir = ('path')
 
 #%%
 #reading edf file - assumes all channels have the same sampling frequency
 
-iedf = files[0]
-
-f = pyedflib.EdfReader(iedf)    
+f = pyedflib.EdfReader(glob.glob(data_dir)[0])  
 annots = f.readAnnotations()
 num_chans = f.signals_in_file
 n_samps = f.getNSamples()[0]
@@ -136,12 +130,10 @@ overlap = int(sf * .90)
 contact = 
 
 sxx_values =[]
-count = 0
 
-while count < len(files):
-    f, t, Sxx = spectrogram(data_all[count][contact], fs=sf, window=('tukey', 0.6), nperseg=interval, noverlap=overlap)
+for epoch_num in data_all:
+    f, t, Sxx = spectrogram(epoch_num[contact], fs=sf, window=('tukey', 0.6), nperseg=interval, noverlap=overlap)
     sxx_values.append(Sxx)
-    count += 1
         
 sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 
@@ -156,4 +148,3 @@ plt.axvline(x=5 , color='k', linestyle='--')   # ... mark stimulus
 plt.axvline(x=7 , color='k', linestyle='--')   
 plt.clim([1,-1])  		# ... power scale, can play around with scaling but it should be balanced (+y,-y)
 plt.show()
-

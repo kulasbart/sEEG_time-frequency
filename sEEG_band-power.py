@@ -8,11 +8,9 @@ from scipy.signal import spectrogram
 import pandas as pd
 import glob
 
-# file directory
-files = glob.glob('')
-files
+# directory path to data 
+data_dir = ('path')
 
-count = 0
 sxx_z = []
 theta_p = []
 alpha_p = []
@@ -24,15 +22,15 @@ alpha_z = []
 beta_z = []
 low_gamma_z = []
 
-while count < len(files):
-    df = pd.read_excel(files[count])
+for ifile in glob.glob(data_dir)
+    df = pd.read_excel(ifile)
     df = df[0:150]
     
     # set the desired frequency ranges
-    theta = df[3:7].to_numpy().mean(axis= 0) # 4-8 Hz
-    alpha = df[7:14].to_numpy().mean(axis= 0) # 8-13 Hz
-    beta = df[14:31].to_numpy().mean(axis= 0) # 13-32 Hz
-    low_gamma = df[31:59].to_numpy().mean(axis= 0) # >32Hz
+    theta = df[3:7].mean(axis= 0) # 4-8 Hz
+    alpha = df[7:14].mean(axis= 0) # 8-13 Hz
+    beta = df[14:31].mean(axis= 0) # 13-32 Hz
+    low_gamma = df[31:59].mean(axis= 0) # >32Hz
     
     # z-scored power changes
     theta_z.append(theta)
@@ -54,7 +52,6 @@ while count < len(files):
     
     s = df.to_numpy()
     sxx_z.append(s)
-    count += 1
 
 
 #%% plots plots plots
