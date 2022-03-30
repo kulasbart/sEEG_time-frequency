@@ -1,15 +1,13 @@
-import pyedflib
-from scipy.fftpack import fft
-from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.signal import spectrogram
 import pandas as pd
 import glob
 
 # directory path to data 
-data_dir = ('path')
+data_dir = ('insert path to normalized xls files') # ... insert path here
+
+#%%
 
 sxx_z = []
 theta_p = []
@@ -22,7 +20,7 @@ alpha_z = []
 beta_z = []
 low_gamma_z = []
 
-for ifile in glob.glob(data_dir)
+for ifile in glob.glob(data_dir):
     df = pd.read_excel(ifile)
     df = df[0:150]
     
@@ -104,7 +102,7 @@ plt.title("low-gamma response")
 plt.axvline(x=0 , color='k', linestyle='--', linewidth=.5)   
 plt.axvline(x=2 , color='k', linestyle='--', linewidth=.5)  
 plt.xlim([-4,8])
-plt.ylim([-150,150])
+plt.ylim([-150,low_gamma_p_m.max()])
 plt.tight_layout()
 plt.show()
 
@@ -120,7 +118,7 @@ df_powerbands.to_clipboard(excel=True,index=False)
 
 #%%
 
-sxx_z_m = np.sum(sxx_z[0:count-1], axis=0) / count
+sxx_z_m = np.sum(sxx_z[0:len(glob.glob(data_dir))-1], axis=0) / len(glob.glob(data_dir))
 
 plt.figure(figsize=(12,8))
 plt.pcolormesh(t, f, np.log10(sxx_z_m), cmap='jet',shading='gouraud')
@@ -137,7 +135,7 @@ plt.show()
 # ensures all files have the same dimensions
 num = 0
 for i in sxx_z:
-    print(files[num])
+    print(glob.glob(data_dir)[num])
     print(len(i))
     print(sxx_z[num].shape)
     num+=1

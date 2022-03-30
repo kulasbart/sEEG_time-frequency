@@ -46,7 +46,7 @@ def notchFilter(data, fs, band, frq, order, filter_type):
 
 #%% collects epoched files from folder, replace 'path' with path to folder ... files must be same length
 
-data_dir = ('path')
+data_dir = ('insert path to epoched files')   # ... insert path here
 
 #%%
 #reading edf file - assumes all channels have the same sampling frequency
@@ -124,7 +124,7 @@ plt.show()
 
 #%% set contact number, interval size and overlap intervals
 
-contact = 25       # ... set contact number - refer to indexing chan_labels
+contact =       # ... set contact number - refer to indexing chan_labels
 interval = int(sf)
 overlap = int(sf * .90)
 count = 0

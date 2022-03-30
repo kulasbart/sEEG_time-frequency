@@ -63,19 +63,14 @@ def get_bsl_SD(bsl_sxx_values):
         ind += 1
     return bsl_SD
 
-#%% path to folder
+#%% collects epoched files from folder, replace 'path' directory path
+# epoched files MUST be the same length
 
-files = glob.glob('') # insert path to folder and wildcard condition
-
-
-files_r = ['r\''+files for files in files] #use for external drives (mac)
-files_r
+data_dir = ('insert path to epoched files')   # ... insert path here
 
 #%% read and writes edf file
 
-iedf = files[0]
-
-f = pyedflib.EdfReader(iedf)    
+f = pyedflib.EdfReader(glob.glob(data_dir)[0])    
 annots = f.readAnnotations()
 num_chans = f.signals_in_file
 n_samps = f.getNSamples()[0]
@@ -97,7 +92,7 @@ data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
 
 epochs = []
 
-for iepoch in files:
+for iepoch in glob.glob(data_dir):
     
     f = pyedflib.EdfReader(iepoch)
     data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
@@ -114,6 +109,7 @@ for iepoch in files:
     
 epochs[0].shape
 
+# unfiltered signal for sample channel
 plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), epochs[0][1])
 plt.show()
@@ -127,6 +123,7 @@ highCut = 150
 
 data_all = []
 
+# filtered signal for sample channel
 for iepoch in epochs:
     
     epochs_f = butterBandpass(iepoch, lowCut, highCut, sf, 3)
@@ -138,24 +135,22 @@ plt.figure(figsize=(10,5))
 plt.plot(np.arange(n_samps), data_all[0][1])
 plt.show()
 
-#%% plots averaged trials
+#%% set contact number, interval size and overlap intervals
 
-# interval size and overlap intervals
+contact =      # ... set contact number - refer to indexing chan_labels
 interval = int(sf)
-overlap = int(sf * .90) 
-
-# specify the contact number
-contact =   # refer to chan_labels
+overlap = int(sf * .90)
 count = 0
 sxx_values =[]
 
-while count < len(files):
+for epoch_num in data_all:
     f, t, Sxx = spectrogram(data_all[count][contact], fs=sf, window=('tukey', 0.6), nperseg=interval, noverlap=overlap)
     sxx_values.append(Sxx)
     count += 1
         
 sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 
+# 
 plt.figure(figsize=(12,8))
 plt.pcolormesh(t, f, np.log10(sxx_m), cmap='jet',shading='gouraud')
 plt.colorbar()                # ... with a color bar,
@@ -188,14 +183,13 @@ for hz in sxx_m:
 plt.figure(figsize=(12,8))
 plt.pcolormesh(t, f, np.log10(sxx_normalized), cmap='jet',shading='gouraud')  # Plot the result
 plt.colorbar()                # ... with a color bar,
-plt.xlim([-4,8]) 
 plt.xlabel('Time (s)',fontweight='bold',fontsize='17')
 plt.xticks(color='k')
 plt.xticks(fontsize= '14')
 plt.ylabel('Frequency (Hz)',fontweight='bold',fontsize='17')
-plt.ylim([4,50])             # ... set the frequency range,
+plt.ylim([4,150])             # ... set the frequency range,
 plt.yticks(fontsize= '14')
-plt.axvline(x=0 , color='k', linestyle='--')   # ... stimulus start
+plt.axvline(x=5 , color='k', linestyle='--')   # ... stimulus start
 plt.axvline(x=7 , color='k', linestyle='--')   # ... end
 plt.clim([1,-1])  		# ... power scale, should be balanced (+y,-y)
 plt.show()
@@ -211,6 +205,7 @@ writer.save()
 
 
 #%% plot the individual trials for quality control
+
 file_num = 0
 
 for sxx_i in sxx_values:
@@ -221,10 +216,12 @@ for sxx_i in sxx_values:
     plt.ylim([4, 150])           
     plt.xlabel('Time (s)')    
     plt.ylabel('Frequency (Hz)')
-    plt.title(files[file_num]) # file name ... useful if you include desc or timestamp in name
+    plt.title(glob.glob(data_dir)[file_num]) # file name ... useful if you include desc or timestamp in name
     plt.axvline(x=5 , color='k', linestyle='--')   
     plt.axvline(x=7 , color='k', linestyle='--')   
     plt.clim([40,-40])  		
     plt.show()
     
     file_num += 1
+    
+print(len(sxx_values))
