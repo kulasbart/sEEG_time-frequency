@@ -76,7 +76,7 @@ epochs = []
 
 # read epochs
 
-for iepoch in files:
+for iepoch in glob.glob(data_dir):
     
     f = pyedflib.EdfReader(iepoch)
     data = np.zeros((num_chans, int(n_samps/downsamplefactor)))
@@ -91,7 +91,7 @@ for iepoch in files:
         
     f.close()
     
-epochs[0].shape
+print(epochs[0].shape)
 
 #plots raw ieeg signal for inspection
 plt.figure(figsize=(10,5))
@@ -122,18 +122,18 @@ plt.xlabel('Time (seconds)')
 plt.ylabel('Voltage')
 plt.show()
 
-#%% set interval size and overlap intervals
+#%% set contact number, interval size and overlap intervals
+
+contact = 25       # ... set contact number - refer to indexing chan_labels
 interval = int(sf)
-overlap = int(sf * .90) 
-
-# set contact number ... indexing chan_labels
-contact = 
-
+overlap = int(sf * .90)
+count = 0
 sxx_values =[]
 
 for epoch_num in data_all:
     f, t, Sxx = spectrogram(epoch_num[contact], fs=sf, window=('tukey', 0.6), nperseg=interval, noverlap=overlap)
     sxx_values.append(Sxx)
+    count += 1
         
 sxx_m = np.sum(sxx_values[0:count-1], axis=0) / (count)
 
